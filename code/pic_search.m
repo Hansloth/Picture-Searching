@@ -1,36 +1,36 @@
 %page is the interger that save the image page
-function varargout = Query(varargin)
-% QUERY MATLAB code for Query.fig
-%      QUERY, by itself, creates a new QUERY or raises the existing
+function varargout = pic_search(varargin)
+% PIC_SEARCH MATLAB code for pic_search.fig
+%      PIC_SEARCH, by itself, creates a new PIC_SEARCH or raises the existing
 %      singleton*.
 %
-%      H = QUERY returns the handle to a new QUERY or the handle to
+%      H = PIC_SEARCH returns the handle to a new PIC_SEARCH or the handle to
 %      the existing singleton*.
 %
-%      QUERY('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in QUERY.M with the given input arguments.
+%      PIC_SEARCH('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in PIC_SEARCH.M with the given input arguments.
 %
-%      QUERY('Property','Value',...) creates a new QUERY or raises the
+%      PIC_SEARCH('Property','Value',...) creates a new PIC_SEARCH or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before Query_OpeningFcn gets called.  An
+%      applied to the GUI before pic_search_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to Query_OpeningFcn via varargin.
+%      stop.  All inputs are passed to pic_search_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help Query
+% Edit the above text to modify the response to help pic_search
 
-% Last Modified by GUIDE v2.5 04-Jun-2020 23:36:33
+% Last Modified by GUIDE v2.5 28-Jun-2020 00:34:46
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
     'gui_Singleton',  gui_Singleton, ...
-    'gui_OpeningFcn', @Query_OpeningFcn, ...
-    'gui_OutputFcn',  @Query_OutputFcn, ...
+    'gui_OpeningFcn', @pic_search_OpeningFcn, ...
+    'gui_OutputFcn',  @pic_search_OutputFcn, ...
     'gui_LayoutFcn',  [] , ...
     'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -45,26 +45,26 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before Query is made visible.
-function Query_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before pic_search is made visible.
+function pic_search_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to Query (see VARARGIN)
+% varargin   command line arguments to pic_search (see VARARGIN)
 
-% Choose default command line output for Query
+% Choose default command line output for pic_search
 handles.output = hObject;
 
 % Update handles structure
 guidata(hObject, handles);
 
-% UIWAIT makes Query wait for user response (see UIRESUME)
+% UIWAIT makes pic_search wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = Query_OutputFcn(hObject, eventdata, handles)
+function varargout = pic_search_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -506,33 +506,26 @@ if get(handles.radiobutton8,'Value')==1
     
 net = xception();
 net.Layers;
-
-
-% f=[];
-% h=waitbar(0,'AI loading...');
-% for i=1:440
-%     picnow=uint8(img(:,:,:,i));
-%     sz=net.Layers(1).InputSize;
-%     picnow=imresize(picnow,[sz(1) sz(2)]);
-%     layer='block14_sepconv2_point-wise';
-%     f=[f;activations(net,picnow,layer,'OutputAs','rows')];
-%      waitbar(i/440,h);
-% end
-% 
-% delete(h);
-
-%save f.mat f;
-load f.mat f;
+f=[];
+for i=1:440
+    picnow=uint8(img(:,:,:,i));
+    sz=net.Layers(1).InputSize;
+    picnow=imresize(picnow,[sz(1) sz(2)]);
+    layer='block14_sepconv2_point-wise';
+    f=[f;activations(net,picnow,layer,'OutputAs','rows')];
+end
 [y,x]=size(f);
+save f.mat f;
+load f.mat f;
 
 ranking=[];
-for m=1:440
-    difference=0;
-    for n=1:x
-       difference=difference+abs(f(findpicnum,n)-f(m,n));
-    end
-    ranking=[ranking,difference];
-end
+% for m=1:440
+%     difference=0;
+%     for n=1:x
+%        difference=difference+abs(f(findpicnum,n)-f(m,n));
+%     end
+%     ranking=[ranking,difference];
+% end
 
     [out,idx] = sort(ranking);
     global allindex;
@@ -557,11 +550,10 @@ if get(handles.radiobutton9,'Value')==1
     findpicnum=str2double(findpicnum);
     axes(handles.axes12);
     imshow(uint8(img(:,:,:,findpicnum)));    
-%     h=waitbar(0,'AI loading...');
+    h=waitbar(0,'AI loading...');
 net=vgg16;
 net.Layers;
-% 
-% fx=[];
+fx=[];
 % for i=1:440
 %     picnow=uint8(img(:,:,:,i));
 %     sz=net.Layers(1).InputSize;
@@ -570,9 +562,9 @@ net.Layers;
 %     fx=[fx;activations(net,picnow,layer,'OutputAs','rows')];
 %     waitbar(i/440,h);
 % end
-% 
-% delete(h);
-% save fx.mat fx;
+
+delete(h);
+save fx.mat fx;
 load fx.mat fx;
 
 ranking=[];
